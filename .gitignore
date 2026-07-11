@@ -1,0 +1,23 @@
+# Safety net — each subproject also has its own .gitignore.
+
+# Secrets — never commit these
+.env
+.env.*
+!.env.example
+!.env.local.example
+
+# Dependencies
+node_modules/
+
+# Hardhat build output
+contract/cache/
+contract/artifacts/
+contract/typechain-types/
+contract/coverage/
+contract/coverage.json
+
+# Next.js build output
+dapp/.next/
+dapp/out/
+dapp/next-env.d.ts
+*.tsbuildinfo
