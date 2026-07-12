@@ -15,6 +15,11 @@ import {
   SUPPORTED_CHAIN_NAMES,
 } from "@/lib/contract";
 
+const CONTACT_EMAIL = "kingvinczi@gmail.com";
+const GITHUB_URL = "https://github.com/kingvinczi-netizen/robinxsol";
+const BASESCAN_URL =
+  "https://basescan.org/token/0xf371Aebf460aC70611A4Ada084d7f4aCADAC72c1";
+
 export default function Home() {
   const { address, isConnected, chainId } = useAccount();
   const contract = getContractAddress(chainId);
@@ -23,8 +28,11 @@ export default function Home() {
     <main className="page">
       <div className="header">
         <div className="brand">
-          <h1>ROBINXSOL</h1>
-          <span>RXS · fixed-supply ERC20</span>
+          <img src="/logo.svg" alt="RXS" width={40} height={40} />
+          <div>
+            <h1>ROBINXSOL</h1>
+            <span>RXS · fixed-supply ERC20</span>
+          </div>
         </div>
         <ConnectButton />
       </div>
@@ -43,8 +51,27 @@ export default function Home() {
           </p>
         </div>
       ) : (
-        <Dashboard account={address as Address} contract={contract} />
+        <Dashboard
+          account={address as Address}
+          contract={contract}
+          chainId={chainId}
+        />
       )}
+
+      <footer className="footer">
+        <span>
+          Contact: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+        </span>
+        <span>
+          <a href={GITHUB_URL} target="_blank" rel="noreferrer">
+            GitHub
+          </a>{" "}
+          ·{" "}
+          <a href={BASESCAN_URL} target="_blank" rel="noreferrer">
+            Contract on Basescan
+          </a>
+        </span>
+      </footer>
     </main>
   );
 }
@@ -52,9 +79,11 @@ export default function Home() {
 function Dashboard({
   account,
   contract,
+  chainId,
 }: {
   account: Address;
   contract: Address;
+  chainId?: number;
 }) {
   const base = { address: contract, abi: RXS_ABI } as const;
 
@@ -102,6 +131,12 @@ function Dashboard({
             {totalSupply !== undefined
               ? Number(formatUnits(totalSupply, dec)).toLocaleString()
               : "…"}
+          </span>
+        </div>
+        <div className="row">
+          <span className="label">Network</span>
+          <span className="value">
+            {chainId ? SUPPORTED_CHAIN_NAMES[chainId] ?? "Unsupported" : "—"}
           </span>
         </div>
       </div>

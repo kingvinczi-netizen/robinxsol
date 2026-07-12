@@ -5,6 +5,7 @@ import { Providers } from "./providers";
 export const metadata: Metadata = {
   title: "ROBINXSOL (RXS)",
   description: "Balance and transfer dapp for the ROBINXSOL ERC20 token",
+  icons: { icon: "/logo.svg" },
 };
 
 export default function RootLayout({
