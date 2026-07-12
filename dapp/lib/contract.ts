@@ -51,8 +51,11 @@ export const RXS_ABI = [
 ] as const;
 
 // Contract address per chain, read from env. Empty string means "not deployed here yet".
+// Sepolia address is baked in as a fallback so the live dapp works without env vars.
 const ADDRESS_BY_CHAIN: Record<number, string> = {
-  [sepolia.id]: process.env.NEXT_PUBLIC_RXS_ADDRESS_SEPOLIA || "",
+  [sepolia.id]:
+    process.env.NEXT_PUBLIC_RXS_ADDRESS_SEPOLIA ||
+    "0xf371Aebf460aC70611A4Ada084d7f4aCADAC72c1",
   [base.id]: process.env.NEXT_PUBLIC_RXS_ADDRESS_BASE || "",
 };
 
