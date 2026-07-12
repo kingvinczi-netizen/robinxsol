@@ -56,7 +56,9 @@ const ADDRESS_BY_CHAIN: Record<number, string> = {
   [sepolia.id]:
     process.env.NEXT_PUBLIC_RXS_ADDRESS_SEPOLIA ||
     "0xf371Aebf460aC70611A4Ada084d7f4aCADAC72c1",
-  [base.id]: process.env.NEXT_PUBLIC_RXS_ADDRESS_BASE || "",
+  [base.id]:
+    process.env.NEXT_PUBLIC_RXS_ADDRESS_BASE ||
+    "0xf371Aebf460aC70611A4Ada084d7f4aCADAC72c1",
 };
 
 // Returns the deployed address for a chain, or undefined if not configured / invalid.
