@@ -15,7 +15,6 @@ import {
   SUPPORTED_CHAIN_NAMES,
 } from "@/lib/contract";
 
-const CONTACT_EMAIL = "kingvinczi@gmail.com";
 const GITHUB_URL = "https://github.com/kingvinczi-netizen/robinxsol";
 const BASESCAN_URL =
   "https://basescan.org/token/0xf371Aebf460aC70611A4Ada084d7f4aCADAC72c1";
@@ -59,9 +58,6 @@ export default function Home() {
       )}
 
       <footer className="footer">
-        <span>
-          Contact: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
-        </span>
         <span>
           <a href={GITHUB_URL} target="_blank" rel="noreferrer">
             GitHub
