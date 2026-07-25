@@ -212,3 +212,205 @@ button.primary:disabled {
 a {
   color: var(--accent);
 }
+
+/* --- Prediction game (betting page) --- */
+
+.countdown {
+  font-size: 40px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+
+.direction-row,
+.amount-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.direction-btn,
+.amount-btn {
+  flex: 1;
+  background: #0e1219;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.direction-btn.up.selected {
+  border-color: var(--success);
+  background: rgba(62, 207, 142, 0.14);
+  color: var(--success);
+}
+
+.direction-btn.down.selected {
+  border-color: var(--danger);
+  background: rgba(255, 107, 107, 0.14);
+  color: var(--danger);
+}
+
+.amount-btn.selected {
+  border-color: var(--accent);
+  background: rgba(91, 140, 255, 0.14);
+  color: var(--accent);
+}
+
+/* --- Scoreboard (projector view) --- */
+
+.scoreboard {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  text-align: center;
+}
+
+.sb-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.sb-header h1 {
+  font-size: 36px;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.sb-waiting {
+  font-size: 24px;
+  color: var(--muted);
+  padding: 80px 0;
+}
+
+.sb-round {
+  color: var(--muted);
+  font-size: 18px;
+  margin-top: 24px;
+}
+
+.sb-countdown {
+  font-size: 140px;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  margin: 8px 0 24px;
+}
+
+.sb-price-row {
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+  margin-bottom: 28px;
+}
+
+.sb-label {
+  color: var(--muted);
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+
+.sb-price {
+  font-size: 32px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.sb-price.live {
+  color: var(--accent);
+}
+
+.sb-bar {
+  display: flex;
+  height: 36px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+
+.sb-bar-up {
+  background: var(--success);
+  transition: width 0.4s ease;
+}
+
+.sb-bar-down {
+  background: var(--danger);
+  transition: width 0.4s ease;
+}
+
+.sb-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 40px;
+}
+
+.sb-history {
+  text-align: left;
+}
+
+.sb-history h2 {
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.sb-hint {
+  color: var(--muted);
+  text-align: center;
+}
+
+.sb-history-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.sb-history-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  font-weight: 700;
+}
+
+.sb-history-item.up {
+  background: rgba(62, 207, 142, 0.1);
+  color: var(--success);
+}
+
+.sb-history-item.down {
+  background: rgba(255, 107, 107, 0.1);
+  color: var(--danger);
+}
+
+.sb-history-item.tie {
+  background: rgba(139, 150, 167, 0.1);
+  color: var(--muted);
+}
+
+.sb-history-round {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+}

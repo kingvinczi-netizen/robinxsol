@@ -1,6 +1,7 @@
 "use client";
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { formatUnits, isAddress, parseUnits, type Address } from "viem";
 import {
@@ -58,6 +59,9 @@ export default function Home() {
       )}
 
       <footer className="footer">
+        <span>
+          <Link href="/game">Play: BTC UP or DOWN</Link>
+        </span>
         <span>
           <a href={GITHUB_URL} target="_blank" rel="noreferrer">
             GitHub
