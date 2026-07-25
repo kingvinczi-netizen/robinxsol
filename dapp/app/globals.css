@@ -1,21 +1,34 @@
 :root {
-  --bg: #1a1f2b;
-  --card: #232a3a;
-  --card-light: #2a3244;
-  --border: #232a36;
+  /* Trading-terminal palette: a near-black void, one warm "live" accent
+     (the old ticker-tape amber), and an electric up/down duality — three
+     accents each doing a distinct semantic job, not one flat color reused
+     everywhere. */
+  --void: #0a0b0d;
+  --panel: #16181d;
+  --panel-light: #1c1f26;
   --text: #eef1f7;
-  --muted: #97a2b8;
-  --accent: #6f9bff;
-  --accent-hover: #85a9ff;
-  --danger: #ff7a7a;
-  --success: #4fd99a;
+  --ghost: #7a8290;
+  --amber: #ffb020;
+  --amber-deep: #e89a12;
+  --up: #00e676;
+  --down: #ff3b5c;
 
-  /* Claymorphism shadow pair: a dark shadow (as if light comes from
-     top-left) plus a soft highlight on the opposite edge. Swapping which
-     side is dark/light is what makes raised vs. recessed ("pressed in")
-     surfaces read correctly. */
-  --clay-dark: rgba(9, 11, 16, 0.55);
-  --clay-light: rgba(255, 255, 255, 0.05);
+  --clay-dark: rgba(4, 5, 7, 0.6);
+  --clay-light: rgba(255, 255, 255, 0.045);
+
+  --font-body: var(--font-display), -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-num: var(--font-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  /* Old names kept as aliases so nothing else in this file needs renaming mid-pass. */
+  --bg: var(--void);
+  --card: var(--panel);
+  --card-light: var(--panel-light);
+  --border: var(--panel);
+  --muted: var(--ghost);
+  --accent: var(--amber);
+  --accent-hover: var(--amber-deep);
+  --danger: var(--down);
+  --success: var(--up);
 }
 
 * {
@@ -24,17 +37,97 @@
 
 body {
   margin: 0;
-  background: radial-gradient(circle at 20% -10%, #232b3d 0%, var(--bg) 55%);
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.012) 0px,
+      rgba(255, 255, 255, 0.012) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    radial-gradient(circle at 20% -10%, #171a22 0%, var(--void) 55%);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-    Arial, sans-serif;
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
 }
 
 .page {
   max-width: 560px;
   margin: 0 auto;
-  padding: 32px 20px 64px;
+  padding: 0 20px 64px;
+}
+
+/* --- Live ticker strip: a scrolling price tape, the persistent reminder
+   this is a live market, not a static form. --- */
+
+.ticker {
+  overflow: hidden;
+  background: var(--void);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin: 0 -20px 28px;
+  padding: 10px 0;
+  white-space: nowrap;
+}
+
+.ticker-track {
+  display: inline-flex;
+  animation: ticker-scroll 22s linear infinite;
+}
+
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 28px;
+  font-family: var(--font-num);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ghost);
+  letter-spacing: 0.02em;
+}
+
+.ticker-item strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--up);
+  box-shadow: 0 0 8px 1px var(--up);
+  animation: live-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.75);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+  }
+  .live-dot {
+    animation: none;
+  }
 }
 
 .header {
@@ -63,16 +156,17 @@ body {
   font-size: 22px;
   margin: 0;
   letter-spacing: -0.02em;
+  font-weight: 700;
 }
 
 .brand span {
-  color: var(--muted);
+  color: var(--ghost);
   font-size: 13px;
+  font-family: var(--font-num);
 }
 
-/* Raised clay panel: soft dual shadow instead of a hard border. */
 .card {
-  background: var(--card);
+  background: var(--panel);
   border: none;
   border-radius: 24px;
   padding: 22px;
@@ -81,11 +175,12 @@ body {
 }
 
 .card h2 {
-  font-size: 14px;
+  font-size: 13px;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--muted);
+  letter-spacing: 0.1em;
+  color: var(--ghost);
   margin: 0 0 14px;
+  font-weight: 600;
 }
 
 .row {
@@ -101,18 +196,19 @@ body {
 }
 
 .row .label {
-  color: var(--muted);
+  color: var(--ghost);
   font-size: 14px;
 }
 
 .row .value {
-  font-variant-numeric: tabular-nums;
+  font-family: var(--font-num);
   font-weight: 600;
   text-align: right;
   word-break: break-word;
 }
 
 .balance {
+  font-family: var(--font-num);
   font-size: 34px;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -120,8 +216,9 @@ body {
 }
 
 .balance small {
+  font-family: var(--font-body);
   font-size: 16px;
-  color: var(--muted);
+  color: var(--ghost);
   font-weight: 600;
 }
 
@@ -133,57 +230,60 @@ label.field {
 label.field span {
   display: block;
   font-size: 13px;
-  color: var(--muted);
+  color: var(--ghost);
   margin-bottom: 6px;
 }
 
-/* Recessed clay well — the opposite shadow direction from .card, so
-   inputs read as a dent pressed into the surface rather than raised. */
 input {
   width: 100%;
-  background: var(--bg);
+  background: var(--void);
   border: none;
   border-radius: 14px;
   padding: 13px 16px;
   color: var(--text);
   font-size: 15px;
-  font-family: inherit;
+  font-family: var(--font-num);
   box-shadow: inset 4px 4px 8px var(--clay-dark), inset -3px -3px 6px var(--clay-light);
 }
 
 input:focus {
   outline: none;
   box-shadow: inset 4px 4px 8px var(--clay-dark), inset -3px -3px 6px var(--clay-light),
-    0 0 0 2px var(--accent);
+    0 0 0 2px var(--amber);
 }
 
 button.primary {
   width: 100%;
-  background: linear-gradient(145deg, var(--accent-hover), var(--accent));
-  color: white;
+  background: linear-gradient(145deg, var(--amber), var(--amber-deep));
+  color: #1a1204;
   border: none;
   border-radius: 16px;
   padding: 14px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
+  font-family: var(--font-body);
   cursor: pointer;
-  box-shadow: 6px 6px 14px var(--clay-dark), -4px -4px 10px rgba(111, 155, 255, 0.15);
-  transition: box-shadow 0.12s ease, transform 0.12s ease;
+  box-shadow: 6px 6px 14px var(--clay-dark), -4px -4px 10px rgba(255, 176, 32, 0.1),
+    0 0 0 rgba(255, 176, 32, 0);
+  transition: box-shadow 0.15s ease, transform 0.12s ease;
 }
 
 button.primary:hover:not(:disabled) {
-  box-shadow: 8px 8px 18px var(--clay-dark), -5px -5px 12px rgba(111, 155, 255, 0.18);
+  box-shadow: 8px 8px 18px var(--clay-dark), -5px -5px 12px rgba(255, 176, 32, 0.14),
+    0 0 22px rgba(255, 176, 32, 0.25);
 }
 
 button.primary:active:not(:disabled) {
-  box-shadow: inset 4px 4px 10px rgba(9, 11, 16, 0.35), inset -3px -3px 8px rgba(255, 255, 255, 0.1);
+  box-shadow: inset 4px 4px 10px rgba(0, 0, 0, 0.4), inset -3px -3px 8px rgba(255, 255, 255, 0.08);
   transform: translateY(1px);
 }
 
 button.primary:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
   box-shadow: none;
+  background: var(--panel-light);
+  color: var(--ghost);
 }
 
 .note {
@@ -195,29 +295,29 @@ button.primary:disabled {
 }
 
 .note.error {
-  background: rgba(255, 122, 122, 0.12);
-  color: var(--danger);
+  background: rgba(255, 59, 92, 0.12);
+  color: var(--down);
 }
 
 .note.success {
-  background: rgba(79, 217, 154, 0.12);
-  color: var(--success);
+  background: rgba(0, 230, 118, 0.12);
+  color: var(--up);
 }
 
 .note.pending {
-  background: rgba(111, 155, 255, 0.12);
-  color: var(--accent);
+  background: rgba(255, 176, 32, 0.12);
+  color: var(--amber);
 }
 
 .hint {
-  color: var(--muted);
+  color: var(--ghost);
   font-size: 13px;
   margin-top: 6px;
 }
 
 .center {
   text-align: center;
-  color: var(--muted);
+  color: var(--ghost);
   padding: 40px 0;
 }
 
@@ -229,22 +329,14 @@ button.primary:disabled {
   padding-top: 16px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   font-size: 13px;
-  color: var(--muted);
+  color: var(--ghost);
 }
 
 a {
-  color: var(--accent);
+  color: var(--amber);
 }
 
 /* --- Prediction game (betting page) --- */
-
-.countdown {
-  font-size: 40px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-  margin-bottom: 12px;
-}
 
 .direction-row,
 .amount-row {
@@ -256,31 +348,117 @@ a {
 .direction-btn,
 .amount-btn {
   flex: 1;
-  background: var(--card-light);
+  background: var(--panel-light);
   border: none;
   border-radius: 16px;
   padding: 15px;
   color: var(--text);
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
+  font-family: var(--font-num);
   cursor: pointer;
   box-shadow: 5px 5px 12px var(--clay-dark), -4px -4px 10px var(--clay-light);
-  transition: box-shadow 0.12s ease, color 0.12s ease;
+  transition: box-shadow 0.15s ease, color 0.15s ease;
 }
 
 .direction-btn.up.selected {
-  color: var(--success);
-  box-shadow: inset 4px 4px 10px rgba(9, 11, 16, 0.4), inset -3px -3px 8px rgba(79, 217, 154, 0.12);
+  color: var(--up);
+  box-shadow: inset 4px 4px 10px rgba(0, 0, 0, 0.45), inset -3px -3px 8px rgba(0, 230, 118, 0.1),
+    0 0 16px rgba(0, 230, 118, 0.25);
 }
 
 .direction-btn.down.selected {
-  color: var(--danger);
-  box-shadow: inset 4px 4px 10px rgba(9, 11, 16, 0.4), inset -3px -3px 8px rgba(255, 122, 122, 0.12);
+  color: var(--down);
+  box-shadow: inset 4px 4px 10px rgba(0, 0, 0, 0.45), inset -3px -3px 8px rgba(255, 59, 92, 0.1),
+    0 0 16px rgba(255, 59, 92, 0.25);
 }
 
 .amount-btn.selected {
-  color: var(--accent);
-  box-shadow: inset 4px 4px 10px rgba(9, 11, 16, 0.4), inset -3px -3px 8px rgba(111, 155, 255, 0.14);
+  color: var(--amber);
+  box-shadow: inset 4px 4px 10px rgba(0, 0, 0, 0.45), inset -3px -3px 8px rgba(255, 176, 32, 0.12);
+}
+
+/* Countdown ring — the signature element. An SVG arc drawn per-instance
+   via inline style (stroke-dashoffset), this file only styles the shell,
+   numerals, and the color/pulse states applied as the fuse burns down. */
+
+.ring {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4px auto 16px;
+}
+
+.ring svg {
+  transform: rotate(-90deg);
+}
+
+.ring-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.06);
+}
+
+.ring-fuse {
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s linear, stroke 0.3s ease;
+}
+
+.ring-number {
+  position: absolute;
+  font-family: var(--font-num);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.ring.critical .ring-number {
+  animation: critical-pulse 0.6s ease-in-out infinite;
+}
+
+@keyframes critical-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring.critical .ring-number {
+    animation: none;
+  }
+}
+
+/* Flashes green/red for a beat when the live price ticks — the same cue
+   real trading tickers use so a moving number reads as "alive." */
+.price-flash-up {
+  animation: flash-up 0.6s ease;
+}
+
+.price-flash-down {
+  animation: flash-down 0.6s ease;
+}
+
+@keyframes flash-up {
+  0% {
+    color: var(--up);
+  }
+  100% {
+    color: inherit;
+  }
+}
+
+@keyframes flash-down {
+  0% {
+    color: var(--down);
+  }
+  100% {
+    color: inherit;
+  }
 }
 
 /* --- Scoreboard (projector view) --- */
@@ -288,7 +466,7 @@ a {
 .scoreboard {
   max-width: 900px;
   margin: 0 auto;
-  padding: 40px 24px 80px;
+  padding: 0 24px 80px;
   text-align: center;
 }
 
@@ -309,27 +487,22 @@ a {
   font-size: 36px;
   margin: 0;
   letter-spacing: -0.02em;
+  font-weight: 700;
 }
 
 .sb-waiting {
   font-size: 24px;
-  color: var(--muted);
+  color: var(--ghost);
   padding: 80px 0;
 }
 
 .sb-round {
-  color: var(--muted);
-  font-size: 18px;
+  color: var(--ghost);
+  font-size: 16px;
+  font-family: var(--font-num);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
   margin-top: 24px;
-}
-
-.sb-countdown {
-  font-size: 140px;
-  font-weight: 800;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.03em;
-  margin: 8px 0 24px;
 }
 
 .sb-price-row {
@@ -340,55 +513,73 @@ a {
 }
 
 .sb-price-row > div {
-  background: var(--card);
+  background: var(--panel);
   border-radius: 20px;
   padding: 18px 40px;
   box-shadow: 7px 7px 16px var(--clay-dark), -5px -5px 12px var(--clay-light);
 }
 
 .sb-label {
-  color: var(--muted);
-  font-size: 14px;
+  color: var(--ghost);
+  font-size: 13px;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
   margin-bottom: 6px;
+  font-weight: 600;
 }
 
 .sb-price {
+  font-family: var(--font-num);
   font-size: 32px;
   font-weight: 700;
-  font-variant-numeric: tabular-nums;
 }
 
 .sb-price.live {
-  color: var(--accent);
+  color: var(--amber);
 }
 
 .sb-bar {
+  position: relative;
   display: flex;
-  height: 40px;
-  border-radius: 20px;
+  height: 44px;
+  border-radius: 22px;
   overflow: hidden;
   margin-bottom: 12px;
   box-shadow: inset 4px 4px 10px var(--clay-dark), inset -3px -3px 8px var(--clay-light);
 }
 
 .sb-bar-up {
-  background: linear-gradient(145deg, #63e8ab, var(--success));
-  transition: width 0.4s ease;
+  background: linear-gradient(90deg, #00b85f, var(--up));
+  transition: width 0.5s ease;
 }
 
 .sb-bar-down {
-  background: linear-gradient(145deg, #ff9494, var(--danger));
-  transition: width 0.4s ease;
+  background: linear-gradient(90deg, var(--down), #d4143a);
+  transition: width 0.5s ease;
+}
+
+.sb-bar-vs {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--void);
+  color: var(--ghost);
+  font-family: var(--font-num);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 8px;
+  letter-spacing: 0.05em;
 }
 
 .sb-bar-labels {
   display: flex;
   justify-content: space-between;
+  font-family: var(--font-num);
   font-size: 15px;
   font-weight: 600;
-  color: var(--muted);
+  color: var(--ghost);
   margin-bottom: 40px;
 }
 
@@ -397,16 +588,17 @@ a {
 }
 
 .sb-history h2 {
-  font-size: 16px;
+  font-size: 15px;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--muted);
+  letter-spacing: 0.1em;
+  color: var(--ghost);
   text-align: center;
   margin-bottom: 16px;
+  font-weight: 600;
 }
 
 .sb-hint {
-  color: var(--muted);
+  color: var(--ghost);
   text-align: center;
 }
 
@@ -423,25 +615,26 @@ a {
   gap: 4px;
   padding: 16px 10px;
   border-radius: 16px;
-  background: var(--card);
+  background: var(--panel);
+  font-family: var(--font-num);
   font-weight: 700;
   box-shadow: 5px 5px 12px var(--clay-dark), -4px -4px 10px var(--clay-light);
 }
 
 .sb-history-item.up {
-  color: var(--success);
+  color: var(--up);
 }
 
 .sb-history-item.down {
-  color: var(--danger);
+  color: var(--down);
 }
 
 .sb-history-item.tie {
-  color: var(--muted);
+  color: var(--ghost);
 }
 
 .sb-history-round {
   font-size: 12px;
-  color: var(--muted);
+  color: var(--ghost);
   font-weight: 500;
 }

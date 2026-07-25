@@ -20,12 +20,18 @@ import {
   formatPythUsd,
 } from "@/lib/game";
 import { useGameRound } from "@/lib/useGameRound";
+import { usePriceFlash } from "@/lib/usePriceFlash";
+import { CountdownRing } from "@/components/CountdownRing";
+import { PriceTicker } from "@/components/PriceTicker";
 
 export default function GamePage() {
   const { address, isConnected, chainId } = useAccount();
+  const { livePrice } = useGameRound();
+  const livePriceStr = livePrice ? formatPythUsd(livePrice.price, livePrice.expo) : undefined;
 
   return (
     <main className="page">
+      <PriceTicker price={livePriceStr} />
       <div className="header">
         <div className="brand">
           <img src="/logo.svg" alt="" width={40} height={40} />
@@ -64,6 +70,7 @@ export default function GamePage() {
 
 function Game({ account }: { account: `0x${string}` }) {
   const { roundId, round, secondsLeft, livePrice, refetch } = useGameRound();
+  const priceFlash = usePriceFlash(livePrice ? Number(livePrice.price) : undefined);
 
   const { data: decimals } = useReadContract({
     address: M2026_ADDRESS,
@@ -139,7 +146,7 @@ function Game({ account }: { account: `0x${string}` }) {
           <p className="hint">Waiting for the game to start...</p>
         ) : (
           <>
-            <div className="countdown">{secondsLeft ?? "…"}s</div>
+            <CountdownRing seconds={secondsLeft} totalSeconds={80} size={140} />
             <div className="row">
               <span className="label">Opened at</span>
               <span className="value">
@@ -148,7 +155,9 @@ function Game({ account }: { account: `0x${string}` }) {
             </div>
             <div className="row">
               <span className="label">Live BTC/USD</span>
-              <span className="value">
+              <span
+                className={`value ${priceFlash === "up" ? "price-flash-up" : priceFlash === "down" ? "price-flash-down" : ""}`}
+              >
                 {livePrice ? formatPythUsd(livePrice.price, livePrice.expo) : "…"}
               </span>
             </div>

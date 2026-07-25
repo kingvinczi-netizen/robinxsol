@@ -4,6 +4,9 @@ import { useReadContract } from "wagmi";
 import { formatUnits } from "viem";
 import { GAME_ABI, GAME_ADDRESS, OUTCOME_LABELS, formatPythUsd } from "@/lib/game";
 import { useGameRound } from "@/lib/useGameRound";
+import { usePriceFlash } from "@/lib/usePriceFlash";
+import { CountdownRing } from "@/components/CountdownRing";
+import { PriceTicker } from "@/components/PriceTicker";
 
 export default function ScoreboardPage() {
   const { roundId, round, secondsLeft, livePrice } = useGameRound();
@@ -14,8 +17,13 @@ export default function ScoreboardPage() {
   const total = upPool + downPool;
   const upPct = total > 0n ? Number((upPool * 100n) / total) : 50;
 
+  const livePriceStr = livePrice ? formatPythUsd(livePrice.price, livePrice.expo) : undefined;
+  const flash = usePriceFlash(livePrice ? Number(livePrice.price) : undefined);
+
   return (
     <main className="scoreboard">
+      <PriceTicker price={livePriceStr} />
+
       <div className="sb-header">
         <img src="/logo.svg" alt="" width={56} height={56} />
         <h1>BTC UP or DOWN</h1>
@@ -26,7 +34,7 @@ export default function ScoreboardPage() {
       ) : (
         <>
           <div className="sb-round">Round {roundId.toString()}</div>
-          <div className="sb-countdown">{secondsLeft ?? "…"}</div>
+          <CountdownRing seconds={secondsLeft} totalSeconds={80} size={260} />
 
           <div className="sb-price-row">
             <div>
@@ -35,8 +43,10 @@ export default function ScoreboardPage() {
             </div>
             <div>
               <div className="sb-label">Live BTC/USD</div>
-              <div className="sb-price live">
-                {livePrice ? formatPythUsd(livePrice.price, livePrice.expo) : "…"}
+              <div
+                className={`sb-price live ${flash === "up" ? "price-flash-up" : flash === "down" ? "price-flash-down" : ""}`}
+              >
+                {livePriceStr ?? "…"}
               </div>
             </div>
           </div>
@@ -44,6 +54,7 @@ export default function ScoreboardPage() {
           <div className="sb-bar">
             <div className="sb-bar-up" style={{ width: `${upPct}%` }} />
             <div className="sb-bar-down" style={{ width: `${100 - upPct}%` }} />
+            <div className="sb-bar-vs">VS</div>
           </div>
           <div className="sb-bar-labels">
             <span>UP · {formatUnits(upPool, dec)} m2026</span>
