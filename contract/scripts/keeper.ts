@@ -7,7 +7,7 @@ import { ethers } from "hardhat";
 // (anyone's tick() would work), this is just the reliable way to drive it
 // during class instead of hoping a browser tab does it.
 
-const GAME = "0x2cca0dED136a4eA8a047b747Db3d40FBDf45D21F"; // BTCPredictionGameV2 (requires a Trader Pass to stake)
+const GAME = "0x52F146AfbA6135DBe15aAD08a37417ed4C2D7548"; // BTCPredictionGameV2 (requires a Trader Pass to stake)
 const BTC_ID = "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43";
 const POLL_INTERVAL_MS = 5000;
 

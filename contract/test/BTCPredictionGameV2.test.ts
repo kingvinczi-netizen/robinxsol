@@ -18,7 +18,7 @@ describe("BTCPredictionGameV2", () => {
     const token = await Token.deploy();
 
     const Pass = await ethers.getContractFactory("TraderPass");
-    const pass = await Pass.deploy();
+    const pass = await Pass.deploy(await token.getAddress());
 
     const MockPyth = await ethers.getContractFactory("MockPyth");
     const pyth = await MockPyth.deploy(3600, 1);
@@ -31,11 +31,12 @@ describe("BTCPredictionGameV2", () => {
       await pass.getAddress()
     );
 
-    // Alice and Bob mint passes and get funded; Carol deliberately has no
-    // pass, so we can prove the gate actually blocks her.
+    // Alice and Bob get funded (so they clear TraderPass's 2 m2026 minimum),
+    // mint passes, then approve the game. Carol deliberately has no pass,
+    // so we can prove the gate actually blocks her.
     for (const player of [alice, bob]) {
-      await pass.connect(player).mint();
       await token.mint(player.address, ethers.parseUnits("10", 18));
+      await pass.connect(player).mint();
       await token.connect(player).approve(await game.getAddress(), ethers.MaxUint256);
     }
     await token.mint(carol.address, ethers.parseUnits("10", 18));

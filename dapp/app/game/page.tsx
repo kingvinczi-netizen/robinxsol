@@ -3,7 +3,7 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { formatUnits, maxUint256 } from "viem";
+import { formatUnits, maxUint256, parseUnits } from "viem";
 import {
   useAccount,
   useReadContract,
@@ -198,7 +198,7 @@ function Game({ account }: { account: `0x${string}` }) {
       {roundId !== undefined && roundId > 0n && !hasStakedThisRound && (
         <>
           {!hasPass ? (
-            <MintPassCard onDone={refetchAll} />
+            <MintPassCard m2026Balance={balance ?? 0n} onDone={refetchAll} />
           ) : needsApproval ? (
             <ApproveCard onDone={refetchAll} />
           ) : (
@@ -235,36 +235,65 @@ function Game({ account }: { account: `0x${string}` }) {
   );
 }
 
-function MintPassCard({ onDone }: { onDone: () => void }) {
-  const { data: hash, error, writeContract, isPending } = useWriteContract();
+function MintPassCard({ m2026Balance, onDone }: { m2026Balance: bigint; onDone: () => void }) {
+  const { data: hash, error, writeContract, isPending, reset } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
+
+  const { data: totalMinted } = useReadContract({
+    address: TRADER_PASS_ADDRESS,
+    abi: TRADER_PASS_ABI,
+    functionName: "totalMinted",
+    query: { refetchInterval: 8000 },
+  });
+  const { data: maxSupply } = useReadContract({
+    address: TRADER_PASS_ADDRESS,
+    abi: TRADER_PASS_ABI,
+    functionName: "MAX_SUPPLY",
+  });
 
   useEffect(() => {
     if (isSuccess) onDone();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccess]);
 
+  const eligible = m2026Balance >= parseUnits("2", 18);
+  const soldOut = totalMinted !== undefined && maxSupply !== undefined && totalMinted >= maxSupply;
+
   return (
     <div className="card">
       <h2>Trader Pass required</h2>
       <p className="hint">
-        This game requires a free Trader Pass NFT before you can bet. Mint
-        yours once, no cost besides a tiny bit of gas, it&apos;s a one-time
-        thing forever.
+        This game requires a free Trader Pass NFT before you can bet. You
+        need at least 2 m2026 to mint one, capped at 20,000 passes total.
       </p>
+      {totalMinted !== undefined && maxSupply !== undefined && (
+        <p className="hint">
+          {totalMinted.toString()} / {maxSupply.toString()} minted
+        </p>
+      )}
       <button
         className="primary"
-        disabled={isPending || isConfirming}
-        onClick={() =>
+        disabled={!eligible || soldOut || isPending || isConfirming}
+        onClick={() => {
+          reset();
           writeContract({
             address: TRADER_PASS_ADDRESS,
             abi: TRADER_PASS_ABI,
             functionName: "mint",
-          })
-        }
+          });
+        }}
       >
-        {isPending ? "Confirm in wallet…" : isConfirming ? "Minting…" : "Mint Trader Pass"}
+        {soldOut
+          ? "Sold out"
+          : isPending
+            ? "Confirm in wallet…"
+            : isConfirming
+              ? "Minting…"
+              : "Mint Trader Pass"}
       </button>
+      {!eligible && !soldOut && (
+        <div className="note pending">You need at least 2 m2026 in your wallet to mint a pass.</div>
+      )}
       {isSuccess && <div className="note success">Pass minted. You can now place bets.</div>}
       {error && (
         <div className="note error">
