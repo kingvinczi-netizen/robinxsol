@@ -7,7 +7,7 @@ import { ethers } from "hardhat";
 // (anyone's tick() would work), this is just the reliable way to drive it
 // during class instead of hoping a browser tab does it.
 
-const GAME = "0xB11c6C01E8A3a0da8Be97D3A9197Dc1E1Fa12D45";
+const GAME = "0x2cca0dED136a4eA8a047b747Db3d40FBDf45D21F"; // BTCPredictionGameV2 (requires a Trader Pass to stake)
 const BTC_ID = "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43";
 const POLL_INTERVAL_MS = 5000;
 
@@ -20,7 +20,7 @@ async function fetchHermesUpdate(): Promise<string> {
 
 async function main() {
   const [signer] = await ethers.getSigners();
-  const game = await ethers.getContractAt("BTCPredictionGame", GAME);
+  const game = await ethers.getContractAt("BTCPredictionGameV2", GAME);
   const pythAddr = await game.pyth();
   const pyth = await ethers.getContractAt("IPyth", pythAddr);
 

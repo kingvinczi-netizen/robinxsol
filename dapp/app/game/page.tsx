@@ -16,6 +16,8 @@ import {
   GAME_ADDRESS,
   M2026_ABI,
   M2026_ADDRESS,
+  TRADER_PASS_ABI,
+  TRADER_PASS_ADDRESS,
   OUTCOME_LABELS,
   formatPythUsd,
 } from "@/lib/game";
@@ -119,6 +121,15 @@ function Game({ account }: { account: `0x${string}` }) {
     query: { refetchInterval: 5000 },
   });
 
+  const { data: passBalance, refetch: refetchPass } = useReadContract({
+    address: TRADER_PASS_ADDRESS,
+    abi: TRADER_PASS_ABI,
+    functionName: "balanceOf",
+    args: [account],
+    query: { refetchInterval: 5000 },
+  });
+
+  const hasPass = passBalance !== undefined && passBalance > 0n;
   const needsApproval = allowance !== undefined && allowance < maxUint256 / 2n;
   const hasStakedThisRound = myStakeAmount !== undefined && myStakeAmount > 0n;
   const roundOpen = roundId !== undefined && roundId > 0n && round && !round[6] && (secondsLeft ?? 0) > 0;
@@ -129,6 +140,7 @@ function Game({ account }: { account: `0x${string}` }) {
     refetchAllowance();
     refetchMyStake();
     refetchWithdrawable();
+    refetchPass();
   }
 
   return (
@@ -185,7 +197,9 @@ function Game({ account }: { account: `0x${string}` }) {
 
       {roundId !== undefined && roundId > 0n && !hasStakedThisRound && (
         <>
-          {needsApproval ? (
+          {!hasPass ? (
+            <MintPassCard onDone={refetchAll} />
+          ) : needsApproval ? (
             <ApproveCard onDone={refetchAll} />
           ) : (
             <StakeCard
@@ -218,6 +232,46 @@ function Game({ account }: { account: `0x${string}` }) {
         <RoundHistory currentRoundId={roundId} decimals={dec} />
       </div>
     </>
+  );
+}
+
+function MintPassCard({ onDone }: { onDone: () => void }) {
+  const { data: hash, error, writeContract, isPending } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
+
+  useEffect(() => {
+    if (isSuccess) onDone();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess]);
+
+  return (
+    <div className="card">
+      <h2>Trader Pass required</h2>
+      <p className="hint">
+        This game requires a free Trader Pass NFT before you can bet. Mint
+        yours once, no cost besides a tiny bit of gas, it&apos;s a one-time
+        thing forever.
+      </p>
+      <button
+        className="primary"
+        disabled={isPending || isConfirming}
+        onClick={() =>
+          writeContract({
+            address: TRADER_PASS_ADDRESS,
+            abi: TRADER_PASS_ABI,
+            functionName: "mint",
+          })
+        }
+      >
+        {isPending ? "Confirm in wallet…" : isConfirming ? "Minting…" : "Mint Trader Pass"}
+      </button>
+      {isSuccess && <div className="note success">Pass minted. You can now place bets.</div>}
+      {error && (
+        <div className="note error">
+          {(error as { shortMessage?: string }).shortMessage || "Mint failed."}
+        </div>
+      )}
+    </div>
   );
 }
 

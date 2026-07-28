@@ -2,11 +2,32 @@ import { type Address } from "viem";
 
 // Sepolia only — m2026 (the lecturer's marks token used as stake) only
 // exists there, so the whole game runs on Sepolia.
-export const GAME_ADDRESS: Address = "0xB11c6C01E8A3a0da8Be97D3A9197Dc1E1Fa12D45";
+// V2: requires holding a TraderPass NFT to stake. The V1 address stays live
+// and verified for the record, but the dapp now points at V2.
+export const GAME_ADDRESS: Address = "0x2cca0dED136a4eA8a047b747Db3d40FBDf45D21F";
+export const TRADER_PASS_ADDRESS: Address = "0x146fc4e90Efb17C58670cbE79B83F1699fd197BC";
 export const M2026_ADDRESS: Address = "0x590c8C64d29598318F5dc6d13910e9B80159D57c";
 export const PYTH_ADDRESS: Address = "0xDd24F84d36BF92C65F92307595335bdFab5Bbd21";
 export const BTC_USD_PRICE_ID =
   "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43";
+
+export const TRADER_PASS_ABI = [
+  {
+    type: "function",
+    name: "balanceOf",
+    stateMutability: "view",
+    inputs: [{ name: "owner", type: "address" }],
+    outputs: [{ type: "uint256" }],
+  },
+  { type: "function", name: "mint", stateMutability: "nonpayable", inputs: [], outputs: [] },
+  {
+    type: "function",
+    name: "tokenURI",
+    stateMutability: "view",
+    inputs: [{ name: "tokenId", type: "uint256" }],
+    outputs: [{ type: "string" }],
+  },
+] as const;
 
 export const M2026_ABI = [
   { type: "function", name: "symbol", stateMutability: "view", inputs: [], outputs: [{ type: "string" }] },
