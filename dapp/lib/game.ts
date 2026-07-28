@@ -6,6 +6,9 @@ import { type Address } from "viem";
 // and verified for the record, but the dapp now points at V2.
 export const GAME_ADDRESS: Address = "0x52F146AfbA6135DBe15aAD08a37417ed4C2D7548";
 export const TRADER_PASS_ADDRESS: Address = "0x62dA5AaF75111E0E46cF4255844005f575550943";
+// Block the TraderPass was deployed at — used as the fromBlock when looking
+// up a wallet's token id via its mint event, so the scan stays tiny.
+export const TRADER_PASS_DEPLOY_BLOCK = 11371459n;
 // TraderPass v2: requires 2 m2026 to mint, capped at 20,000, glossy on-chain art.
 export const M2026_ADDRESS: Address = "0x590c8C64d29598318F5dc6d13910e9B80159D57c";
 export const PYTH_ADDRESS: Address = "0xDd24F84d36BF92C65F92307595335bdFab5Bbd21";

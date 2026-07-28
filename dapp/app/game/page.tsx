@@ -25,6 +25,7 @@ import { useGameRound } from "@/lib/useGameRound";
 import { usePriceFlash } from "@/lib/usePriceFlash";
 import { CountdownRing } from "@/components/CountdownRing";
 import { PriceTicker } from "@/components/PriceTicker";
+import { TraderPassImage } from "@/components/TraderPassImage";
 
 export default function GamePage() {
   const { address, isConnected, chainId } = useAccount();
@@ -151,6 +152,8 @@ function Game({ account }: { account: `0x${string}` }) {
           {balance !== undefined ? formatUnits(balance, dec) : "…"} <small>m2026</small>
         </div>
       </div>
+
+      {hasPass && <TraderPassImage account={account} />}
 
       <div className="card">
         <h2>Round {roundId?.toString() ?? "…"}</h2>
