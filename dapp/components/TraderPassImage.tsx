@@ -18,13 +18,15 @@ import {
 // getLogs at a tiny block range; these public endpoints allow bigger ranges.
 // Falls back across providers so one rate-limited/down endpoint can't blank
 // the whole card, and the chunked scan below keeps each call under whatever
-// per-request range cap the active provider enforces.
+// per-request range cap the active provider enforces (verified live:
+// tenderly tolerates 100k+ block ranges, drpc caps at 10k on its free tier;
+// publicnode now gates getLogs behind a paid archive token and
+// rpc.sepolia.org no longer responds at all, so both were dropped).
 const logClient = createPublicClient({
   chain: sepolia,
   transport: fallback([
+    http("https://sepolia.gateway.tenderly.co"),
     http("https://sepolia.drpc.org"),
-    http("https://ethereum-sepolia-rpc.publicnode.com"),
-    http("https://rpc.sepolia.org"),
   ]),
 });
 
@@ -38,7 +40,7 @@ const TRANSFER_EVENT = {
   ],
 } as const;
 
-const LOG_SCAN_CHUNK = 50_000n;
+const LOG_SCAN_CHUNK = 9_999n;
 
 async function getMintLogs(account: Address) {
   const latest = await logClient.getBlockNumber();
