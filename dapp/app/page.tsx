@@ -15,6 +15,7 @@ import {
   getContractAddress,
   SUPPORTED_CHAIN_NAMES,
 } from "@/lib/contract";
+import { resetWalletSession } from "@/lib/resetWalletSession";
 
 const GITHUB_URL = "https://github.com/kingvinczi-netizen/robinxsol";
 const BASESCAN_URL =
@@ -40,6 +41,11 @@ export default function Home() {
       {!isConnected ? (
         <div className="card">
           <p className="center">Connect your wallet to view your RXS balance.</p>
+          <p className="center">
+            <button className="reset-link" onClick={resetWalletSession}>
+              Wallet stuck? Reset connection
+            </button>
+          </p>
         </div>
       ) : !contract ? (
         <div className="card">

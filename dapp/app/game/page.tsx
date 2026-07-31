@@ -22,6 +22,7 @@ import {
   formatPythUsd,
 } from "@/lib/game";
 import { useGameRound } from "@/lib/useGameRound";
+import { resetWalletSession } from "@/lib/resetWalletSession";
 import { usePriceFlash } from "@/lib/usePriceFlash";
 import { CountdownRing } from "@/components/CountdownRing";
 import { PriceTicker } from "@/components/PriceTicker";
@@ -49,6 +50,11 @@ export default function GamePage() {
       {!isConnected ? (
         <div className="card">
           <p className="center">Connect your wallet to play.</p>
+          <p className="center">
+            <button className="reset-link" onClick={resetWalletSession}>
+              Wallet stuck? Reset connection
+            </button>
+          </p>
         </div>
       ) : chainId !== sepolia.id ? (
         <div className="card">
