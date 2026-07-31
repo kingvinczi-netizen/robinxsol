@@ -1,5 +1,7 @@
 # ROBINXSOL (RXS)
 
+<!-- Deployed to Vercel automatically from main via GitHub integration. -->
+
 A fixed-supply, ownerless ERC20 token and a web dapp to view balances and send tokens.
 
 - **Token:** ROBINXSOL, symbol **RXS**, 18 decimals, fixed supply of **1,000,000,000** (1B).
