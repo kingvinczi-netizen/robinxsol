@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { createPublicClient, http, type Address } from "viem";
+import { createPublicClient, fallback, http, type Address } from "viem";
 import { sepolia } from "wagmi/chains";
 import { useReadContract } from "wagmi";
 import {
@@ -15,11 +15,17 @@ import {
 // image host needed.
 
 // Dedicated client for the one event-log lookup. The app's default RPC caps
-// getLogs at a tiny block range; this public endpoint allows the full range
-// in a single call.
+// getLogs at a tiny block range; these public endpoints allow bigger ranges.
+// Falls back across providers so one rate-limited/down endpoint can't blank
+// the whole card, and the chunked scan below keeps each call under whatever
+// per-request range cap the active provider enforces.
 const logClient = createPublicClient({
   chain: sepolia,
-  transport: http("https://sepolia.drpc.org"),
+  transport: fallback([
+    http("https://sepolia.drpc.org"),
+    http("https://ethereum-sepolia-rpc.publicnode.com"),
+    http("https://rpc.sepolia.org"),
+  ]),
 });
 
 const TRANSFER_EVENT = {
@@ -32,6 +38,25 @@ const TRANSFER_EVENT = {
   ],
 } as const;
 
+const LOG_SCAN_CHUNK = 50_000n;
+
+async function getMintLogs(account: Address) {
+  const latest = await logClient.getBlockNumber();
+  const logs = [];
+  for (let from = TRADER_PASS_DEPLOY_BLOCK; from <= latest; from += LOG_SCAN_CHUNK) {
+    const to = from + LOG_SCAN_CHUNK - 1n > latest ? latest : from + LOG_SCAN_CHUNK - 1n;
+    const chunk = await logClient.getLogs({
+      address: TRADER_PASS_ADDRESS,
+      event: TRANSFER_EVENT,
+      args: { to: account },
+      fromBlock: from,
+      toBlock: to,
+    });
+    logs.push(...chunk);
+  }
+  return logs;
+}
+
 export function TraderPassImage({ account }: { account: Address }) {
   const [tokenId, setTokenId] = useState<bigint | undefined>();
   const [failed, setFailed] = useState(false);
@@ -43,13 +68,7 @@ export function TraderPassImage({ account }: { account: Address }) {
     setFailed(false);
     (async () => {
       try {
-        const logs = await logClient.getLogs({
-          address: TRADER_PASS_ADDRESS,
-          event: TRANSFER_EVENT,
-          args: { to: account },
-          fromBlock: TRADER_PASS_DEPLOY_BLOCK,
-          toBlock: "latest",
-        });
+        const logs = await getMintLogs(account);
         if (cancelled) return;
         if (logs.length > 0) {
           setTokenId(logs[logs.length - 1].args.tokenId);
